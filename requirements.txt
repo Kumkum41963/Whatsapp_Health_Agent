@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+twilio
+python-multipart
+google-genai
+python-dotenv
+openai
+ollama
+httpx

@@ -17,7 +17,7 @@ def get_current_timestamp() -> str:
     print("[Timestamp]", timestamp)
     return timestamp
 
-
+# Loads the entire data.json file
 def load_all_data() -> dict:
 
     print("\n[DATA] Loading data...")
@@ -48,7 +48,7 @@ def load_all_data() -> dict:
 
     return {}
 
-
+# Saves the data to data.json file (chat logs, food logs...)
 def save_all_data(data: dict):
 
     print("\n[DATA] Saving data...")
@@ -76,6 +76,7 @@ def save_all_data(data: dict):
 # USER
 # ============================================================
 
+# If user already there, return it, Else create a new user with default profile and return it
 def get_or_create_user(phone_number: str, data: dict) -> dict:
 
     print("\n[USER] Looking for user:", phone_number)
@@ -87,7 +88,7 @@ def get_or_create_user(phone_number: str, data: dict) -> dict:
 
         data[phone_number] = {
             "profile": {
-                "name": "Kumkum",
+                "name": "Random",
                 "age": 22,
                 "activity_level": "moderate"
             },
@@ -130,6 +131,7 @@ def get_or_create_user(phone_number: str, data: dict) -> dict:
 # DOWNLOAD IMAGE
 # ============================================================
 
+# Downloads image bytes from Twilio media URL using Twilio creds.
 def download_image_bytes(image_url: str) -> bytes | None:
 
     print("\n========== IMAGE DOWNLOAD ==========")
@@ -441,6 +443,7 @@ def generate_health_response(
     - Food Log History: {json.dumps(user_record['food_log'], indent=2)}
     """
 
+    # Building conv. history for LLM with system instr. , rcent chats and current user input
     messages = [
         {
             "role": "system",

@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Response, BackgroundTasks
 from twilio.rest import Client
+# TwiML is Twilio Markup Language
 from twilio.twiml.messaging_response import MessagingResponse
 from gemini import generate_health_response
 
@@ -137,7 +138,7 @@ async def whatsapp(
         if request.method == "POST":
             print("[Request] Reading POST form data...")
             data = await request.form()
-            print("[Request] Form data received:", ", ".join(data.keys()))
+            print("[Request] Form data received:", data)
         else:
             print("[Request] Reading GET query parameters...")
             data = request.query_params
@@ -157,6 +158,7 @@ async def whatsapp(
         print("Sender received:", bool(sender))
         print("Image received:", bool(image_url))
 
+        # Someone might send a message without a sender (e.g., if the request is malformed). Handle that case gracefully.
         if not sender:
             return Response(
                 content="Missing WhatsApp sender",
@@ -183,6 +185,7 @@ async def whatsapp(
         # PROCESS MESSAGE
         # ----------------------------------------------------
 
+        # Ensure to check for both empty text or image URL, as a user might send empty msg wt. an image or vice versa.
         if not message.strip() and not image_url:
             return Response(
                 content="No text or supported image was received",
@@ -190,6 +193,7 @@ async def whatsapp(
             )
 
         twilio_resp = MessagingResponse()
+        # If there is an image, process it in background and send an ack. that process has started.
         if image_url:
             background_tasks.add_task(
                 process_and_send_whatsapp,
@@ -206,6 +210,7 @@ async def whatsapp(
                     phone_number=clean_sender,
                     image_url=None
                 )
+                print("[Webhook] Reply generated:", reply_text)
             except Exception as e:
                 print("[Webhook] Message processing failed:", type(e).__name__, e)
                 reply_text = "Sorry, I couldn't process that message right now. Please try again."
